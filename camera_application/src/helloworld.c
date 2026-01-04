@@ -175,6 +175,27 @@ int main()
 
         xil_printf("[INFO]  OV7670 Reg: 0x%02X: 0x%02X\n", reg_addr[i], iic_read_buf[0]);
     }
+
+
+    iic_write_buf[0] = 0x01;
+    iic_write_buf[1] = 0x80;
+    status = Iic_WriteData(2);
+    if(status!=XST_SUCCESS)
+    {
+        xil_printf("[ERROR] Failed to write register at %d, status: %d\n", 0x01, status);
+        return XST_FAILURE;
+    }
+    xil_printf("[DEBUG] OV7670 Reg: 0x%02X: 0x%02X\n", iic_write_buf[0], iic_write_buf[1]);
+
+    // Trying a read, write
+    status = Iic_ReadData(0x01, 1); // Register for blue Gain
+    if(status!=XST_SUCCESS)
+    {
+        xil_printf("[ERROR] Failed to read register at %d, status: %d\n", 0x01, status);
+        return XST_FAILURE;
+    }
+    xil_printf("[INFO]  OV7670 Reg: 0x%02X: 0x%02X\n", 0x01, iic_read_buf[0]);
+
     // blink_leds();
     cleanup_platform();
     return 0;
