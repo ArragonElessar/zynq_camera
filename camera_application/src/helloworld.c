@@ -28,7 +28,7 @@ static XScuGic intr_ctl;                // Interrupt Controller Struct
 static XScuGic_Config* intr_cfg;        // Configuration for the Interrupt controller struct
 
 // We need to confirm this for the OV7670
-static const int iic_write_address = 0x21; // 7-bit address ??
+static const int iic_write_address = 0x21; // 7-bit address !!
 
 volatile u8 iic_transmit_complete;      // Flag to check IIC Transmission complete
 volatile u8 iic_recieve_complete;       // Flag to check IIC Recieve Data complete
@@ -44,6 +44,9 @@ static void StatHandler(XIic* iic, int event);
 int Iic_WriteData(int byte_cnt);
 int Iic_ReadData(u8 address, int byte_cnt);
 
+// Helper Methods
+void print_iic_register(u8 reg_offset);
+
 // Buffers for IIC Read, Write
 u8 *iic_write_buf;
 u8 *iic_read_buf;
@@ -51,9 +54,8 @@ u8 *iic_read_buf;
 int main()
 {
     init_platform();
-    usleep(1000000); // Wait for the PLL Clock ?? 
     
-    print("Welcome to Camera Application!\n");
+    print("\n\n\n[INFO]  Welcome to Camera Application!\n");
     int status;
 
     // Init the GPIOs and present a basic pattern to the LEDs
@@ -77,19 +79,32 @@ int main()
     XGpio_DiscreteWrite(&camera_gpio, 1, 2U); // Power On and Release Reset
     usleep(100000); // Wait for Camera to boot
     
+    // Verify written values ( not necessary )
     u32 camera_control_state = XGpio_DiscreteRead(&camera_gpio, 1);
-    xil_printf("[DEBUG] Current Camera State: %d\n", camera_control_state);
-    // CRITICAL: The OV7670 internal PLL needs time to lock onto your 24MHz XCLK
-    // Attempting IIC communication before this will result in no ACK.
-    usleep(1000000); // Wait 1 full second
-    // blink_leds();
+    xil_printf("[DEBUG] Current Camera State, RESET: %d, PWDN: %d\n", (camera_control_state >> 1), ( camera_control_state & 1 ));
 
+    // Set up the Camera Controls
+    // We need the XCLK to be up at 24MHz before starting IIC Communications
+    
     status = XGpio_Initialize(&locked_gpio, LOCKED_BA);
     if(status != XST_SUCCESS) return XST_FAILURE;
-    XGpio_SetDataDirection(&camera_gpio, 1, 0xFFFFFFFF); // All outputs
+    XGpio_SetDataDirection(&camera_gpio, 1, 0xFFFFFFFF); // All inputs
 
     u32 clock_locked_signal = XGpio_DiscreteRead(&locked_gpio, 1);
-    xil_printf("[DEBUG] Clock Locked signal: %d\n", clock_locked_signal);
+    int timeout = 100;
+    while ( ( clock_locked_signal != 1 ) && ( timeout > 0 ) )
+    {
+        clock_locked_signal = XGpio_DiscreteRead(&locked_gpio, 1);
+        timeout--;
+        usleep(100);
+    }
+
+    if( timeout == 0 )
+    {
+        xil_printf("[ERROR] Timed out waiting for 24MHz XCLK Signal to be locked.\n");
+        return XST_FAILURE;
+    }
+    xil_printf("[DEBUG] XCLK (24MHz) clock locked signal: %d\n", clock_locked_signal);
 
     // ------------------------------- Now Initialise the IIC Driver -----------------------------------------
     
@@ -104,10 +119,7 @@ int main()
     iic_read_buf = (u8*) malloc(BUFFER_SIZE);
     iic_write_buf = (u8*) malloc(BUFFER_SIZE);
 
-    xil_printf("[DEBUG] Successfully Initialied IIC controller, buffers of size: %d bytes\n", BUFFER_SIZE);
-
-    u32 reg_value = XIic_ReadReg(IIC_CAMERA_BA, XIIC_SR_REG_OFFSET);
-    xil_printf("[DEBUG] Initial IIC Status Register value: 0x%08X\n", reg_value);
+    xil_printf("[DEBUG] Initialied IIC controller, buffers of size: %d bytes\n", BUFFER_SIZE);
 
     // ------------------------------ Now Setup the Interrupt System ------------------------------------------
 
@@ -142,7 +154,7 @@ int main()
     XIic_SetRecvHandler(&iic_camera, &iic_camera, (XIic_Handler) RecvHandler);
     XIic_SetStatusHandler(&iic_camera, &iic_camera, (XIic_StatusHandler) StatHandler);
 
-    xil_printf("[DEBUG] Successfully setup the Interrupt System for IIC!\n");
+    xil_printf("[DEBUG] Interrupt System for IIC setup.\n");
 
     // --------------------------------- Basic Read Write Test --------------------------------------------------------
     status = XIic_SetAddress(&iic_camera, XII_ADDR_TO_SEND_TYPE, iic_write_address);
@@ -161,7 +173,7 @@ int main()
             return XST_FAILURE;
         }
 
-        xil_printf("Reg: 0x%02X, Value: 0x%02X\n", reg_addr[i], iic_read_buf[0]);
+        xil_printf("[INFO]  OV7670 Reg: 0x%02X: 0x%02X\n", reg_addr[i], iic_read_buf[0]);
     }
     // blink_leds();
     cleanup_platform();
@@ -206,9 +218,8 @@ int Iic_WriteData(int byte_cnt)
 
     int status;
 
-    // These are reset at the start of every data write
+    // Reset at the start of every data write
     iic_transmit_complete = 1;
-    iic_camera.Stats.TxErrors = 0;
 
     // Start the IIC instance
     status = XIic_Start(&iic_camera);
@@ -230,14 +241,7 @@ int Iic_WriteData(int byte_cnt)
 
     // Once the transmission is done, the XIIC Controller will raise an interrupt, which will be handled by our Send Handler method.
     // So we need to check the iic_transmit_complete flag;
-    int timeout = 10000000;
-    while( iic_transmit_complete || (XIic_IsIicBusy(&iic_camera) == TRUE) )
-    {
-        timeout--;
-    }
-
-    u32 reg_value = XIic_ReadReg(IIC_CAMERA_BA, XIIC_SR_REG_OFFSET);
-    xil_printf("[DEBUG] Transmission Complete, IIC Status Register value: 0x%08X, timeout cnt: %d\n", reg_value, timeout);
+    while( iic_transmit_complete || (XIic_IsIicBusy(&iic_camera) == TRUE) );
 
     // Stop the IIC Device
     status = XIic_Stop(&iic_camera);
@@ -281,14 +285,7 @@ int Iic_ReadData(u8 address, int byte_cnt)
     }
 
     // Now we wait for the read complete interrupt to come in
-    int timeout = 10000000;
-    while( iic_recieve_complete || (XIic_IsIicBusy(&iic_camera) == TRUE) )
-    {
-        timeout--;
-    }
-
-    u32 reg_value = XIic_ReadReg(IIC_CAMERA_BA, XIIC_SR_REG_OFFSET);
-    xil_printf("[DEBUG] Recieve operation complete, IIC Status Register value: 0x%08X\n", reg_value);
+    while( iic_recieve_complete || (XIic_IsIicBusy(&iic_camera) == TRUE) ); // May need to add debug signals here if tx/rx fail.
  
     // Stop the IIC Device
     status = XIic_Stop(&iic_camera);
@@ -299,4 +296,11 @@ int Iic_ReadData(u8 address, int byte_cnt)
     }
 
     return XST_SUCCESS;
+}
+
+
+void print_iic_register(u8 reg_offset)
+{
+    u32 reg_value = XIic_ReadReg(IIC_CAMERA_BA, reg_offset);
+    xil_printf("[DEBUG] Recieve operation complete, IIC Register: 0x%02X: 0x%08X\n", reg_offset, reg_value);
 }
