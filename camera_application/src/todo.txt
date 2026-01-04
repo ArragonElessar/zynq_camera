@@ -1,0 +1,27 @@
+4/1/26
+
+TODOs
+
+[SOFTWARE] 
+1. Logical seperation from the helloworld.c code
+    - seperate out the ov7670 driver code.
+    - clean up IIC functions, and organise into functional code
+
+2. Read the datasheet thoroughly to find the configuration sequence
+    - Also understand basics, what is hue, what are the different color modes etc.
+
+3. Create a complete source code, logically clean, provides basic configuration for the camera.
+
+[HARDWARE]
+1. Custom IP creation for collecting and streaming video in data from the OV7670
+    - custom AXI-4 Lite slave interface and a register address space. 
+        - decide which datapoints are good enough to be included as a register
+    - deep FIFO buffer to collect incoming 8 bit numbers, at each PCLK high. 
+    - math to combine 2 - 8 bit ints to 16 bits - this represents a complete pixel.
+    - move the pixel to either
+        - another fifo where Video Out Systems can pick it up, using AXI4-Stream protocol
+        - or store via a DMA to RAM (BRAM / DDR) so that our ARM processor can pick it up.
+
+2. If time permits, learn about Xilinx ILA.
+3. Think about testbenches and how we can test this ip.
+4. Decent name for this IP. 
