@@ -160,10 +160,6 @@ drv_info:
     driver: iic
     ip_name: axi_iic
     path: /tools/Xilinx/2025.1/Vitis/data/embeddedsw/XilinxProcessorIPLib/drivers/iic_v3_13
-  clk_locked_gpio:
-    driver: gpio
-    ip_name: axi_gpio
-    path: /tools/Xilinx/2025.1/Vitis/data/embeddedsw/XilinxProcessorIPLib/drivers/gpio_v4_12
   led_control:
     driver: gpio
     ip_name: axi_gpio

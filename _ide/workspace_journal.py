@@ -18,3 +18,39 @@ status = platform.build()
 
 comp.build()
 
+status = platform.update_hw(hw_design = "$COMPONENT_LOCATION/../../camera_hardware.xsa")
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+
+status = platform.build()
+
+comp.build()
+

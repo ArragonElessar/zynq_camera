@@ -55,7 +55,6 @@
 			      <0xffff0000 &ps7_ram_1_memory 0xffff0000 0xfe00>, 
 			      <0x41200000 &led_control 0x41200000 0x10000>, 
 			      <0x41210000 &camera_control 0x41210000 0x10000>, 
-			      <0x41220000 &clk_locked_gpio 0x41220000 0x10000>, 
 			      <0x41600000 &camera_iic 0x41600000 0x10000>, 
 			      <0xf8008000 &ps7_afi_0 0xf8008000 0x1000>, 
 			      <0xf8009000 &ps7_afi_1 0xf8009000 0x1000>, 

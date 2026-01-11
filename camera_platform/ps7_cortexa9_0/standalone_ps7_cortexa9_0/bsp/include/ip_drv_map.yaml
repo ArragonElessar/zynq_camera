@@ -4,9 +4,6 @@ camera_control:
 camera_iic:
 - axi_iic
 - iic
-clk_locked_gpio:
-- axi_gpio
-- gpio
 led_control:
 - axi_gpio
 - gpio

@@ -20,11 +20,11 @@
 			#gpio-cells = <2>;
 			xlnx,gpio-width = <2>;
 			xlnx,dout-default = <0x0>;
-			xlnx,is-dual = <0>;
+			xlnx,is-dual = <1>;
 			xlnx,ip-name = "axi_gpio";
 			xlnx,tri-default-2 = <0xffffffff>;
 			reg = <0x41210000 0x10000>;
-			xlnx,all-inputs-2 = <0>;
+			xlnx,all-inputs-2 = <1>;
 			clocks = <&clkc 15>;
 			xlnx,all-outputs-2 = <0>;
 			gpio-controller;
@@ -33,7 +33,7 @@
 			xlnx,edk-iptype = "PERIPHERAL";
 			xlnx,dout-default-2 = <0x0>;
 			status = "okay";
-			xlnx,gpio2-width = <32>;
+			xlnx,gpio2-width = <1>;
 			clock-names = "s_axi_aclk";
 			xlnx,tri-default = <0xffffffff>;
 			xlnx,name = "camera_control";
@@ -66,32 +66,6 @@
 			xlnx,name = "camera_iic";
 			xlnx,axi-aclk-freq-mhz = <0x5f5e095>;
 			xlnx,sda-inertial-delay = <0>;
-		};
-		clk_locked_gpio: gpio@41220000 {
-			xlnx,gpio-board-interface = "Custom";
-			compatible = "xlnx,axi-gpio-2.0" , "xlnx,xps-gpio-1.00.a";
-			xlnx,all-outputs = <0>;
-			#gpio-cells = <2>;
-			xlnx,gpio-width = <1>;
-			xlnx,dout-default = <0x0>;
-			xlnx,is-dual = <0>;
-			xlnx,ip-name = "axi_gpio";
-			xlnx,tri-default-2 = <0xffffffff>;
-			reg = <0x41220000 0x10000>;
-			xlnx,all-inputs-2 = <0>;
-			clocks = <&clkc 15>;
-			xlnx,all-outputs-2 = <0>;
-			gpio-controller;
-			xlnx,interrupt-present = <0>;
-			xlnx,gpio2-board-interface = "Custom";
-			xlnx,edk-iptype = "PERIPHERAL";
-			xlnx,dout-default-2 = <0x0>;
-			status = "okay";
-			xlnx,gpio2-width = <32>;
-			clock-names = "s_axi_aclk";
-			xlnx,tri-default = <0xffffffff>;
-			xlnx,name = "clk_locked_gpio";
-			xlnx,all-inputs = <1>;
 		};
 		led_control: gpio@41200000 {
 			xlnx,gpio-board-interface = "Custom";
