@@ -141,7 +141,7 @@
 
 /* Definitions for peripheral CAMERA_IIC */
 #define XPAR_CAMERA_IIC_COMPATIBLE "xlnx,axi-iic-2.1"
-#define XPAR_CAMERA_IIC_BASEADDR 0x41600000
+#define XPAR_CAMERA_iic_base_addr 0x41600000
 #define XPAR_CAMERA_IIC_HIGHADDR 0x4160ffff
 #define XPAR_CAMERA_IIC_TEN_BIT_ADR 0x0
 #define XPAR_CAMERA_IIC_GPO_WIDTH 0x1

@@ -30,6 +30,8 @@ set(USER_INCLUDE_DIRECTORIES
 set(USER_COMPILE_SOURCES
 "platform.c"
 "main.c"
+"ov7670.c"
+"iic_helper.c"
 )
 
 # -----------------------------------------

@@ -1,4 +1,4 @@
-# 2026-01-04T14:17:21.611492
+# 2026-01-11T14:02:58.649602
 import vitis
 
 client = vitis.create_client()
@@ -8,42 +8,6 @@ platform = client.get_component(name="camera_platform")
 status = platform.build()
 
 comp = client.get_component(name="camera_application")
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
-comp.build()
-
-status = platform.build()
-
 comp.build()
 
 status = platform.build()
