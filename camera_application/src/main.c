@@ -73,10 +73,24 @@ int main()
     if( status != XST_SUCCESS ) return XST_FAILURE; 
     xil_printf("[DEBUG] OV7670 Camera IIC Control System Ready!\n");
 
+    // Perform a software reset
+    status = OV7670_Reset(&camera);
+
     // -------------------------------- IIC Test for OV7670 Driver -----------------------------------------
     status = OV7670_Reg_ReadWrite_Test(&camera);
     if(status != XST_SUCCESS) return XST_FAILURE;
-    
+
+    // basic setup for camera
+    status = OV7670_Basic_Setup(&camera);
+    if(status != XST_SUCCESS)
+    {
+        xil_printf("[DEBUG] Failed to setup OV7670 with status: %d\n", status);
+        return XST_FAILURE;
+    }
+
+    // Now we need some time to catch the data ( check if it is coming as well )
+    blink_leds();
+
     cleanup_platform();
     return 0;
 }

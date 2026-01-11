@@ -11,10 +11,15 @@
 #define REG_MIDH    0x1C // Mfr ID - High ( expected 0x7f) - R
 #define REG_MIDL    0x1D // Mfr ID - Low ( expected 0xA2)  - R
 #define REG_BLUE    0x01 // Blue Channel Gain Setting    - R/W
+#define REG_CLKRC   0x11 // Internal Clock Register      - R/W
 #define REG_COM7    0x12 // Common Control 7             - R/W
+#define REG_COM15   0x40 // Common Control 15 - Output Format - R/W
 
 // Register Controls
-#define REG_COM7_RESET (u8)0x80
+#define REG_COM7_RESET              (u8)0x80
+#define REG_COM7_RGB_MODE           (u8)0x04
+#define REG_COM15_RGB555_FULL_RANGE (u8)0xD0
+#define REG_CLKRC_CLK_DIV_2         (u8)0x01
 
 // IIC Address for the OV7670 - 7 bit
 #define OV7670_IIC_ADDR (u8)0x21 
@@ -32,5 +37,11 @@ int OV7670_WriteReg(OV7670* cam, u8 reg, u8 data);
 
 // Self-Test 
 int OV7670_Reg_ReadWrite_Test(OV7670* cam);
+
+// Software Reset
+int OV7670_Reset(OV7670* cam);
+
+// Basic Setup
+int OV7670_Basic_Setup(OV7670* cam);
 
 #endif

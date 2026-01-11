@@ -3,14 +3,11 @@
 TODOs
 
 [SOFTWARE] 
-1. Logical seperation from the helloworld.c code
-    - seperate out the ov7670 driver code.
-    - clean up IIC functions, and organise into functional code
 
-2. Read the datasheet thoroughly to find the configuration sequence
+1. Read the datasheet thoroughly to find the configuration sequence
     - Also understand basics, what is hue, what are the different color modes etc.
 
-3. Create a complete source code, logically clean, provides basic configuration for the camera.
+2. Create a complete source code, logically clean, provides basic configuration for the camera.
 
 [HARDWARE]
 1. Custom IP creation for collecting and streaming video in data from the OV7670

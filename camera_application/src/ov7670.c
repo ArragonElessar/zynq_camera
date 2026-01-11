@@ -122,4 +122,45 @@ int OV7670_Reg_ReadWrite_Test(OV7670 *cam)
     return status;
 }
 
+int OV7670_Reset(OV7670 *cam)
+{
+    int status;
+
+    status = OV7670_WriteReg(cam, REG_COM7, REG_COM7_RESET);
+    xil_printf("[DEBUG] Software Reset, Write Reg Status: %d\n", status);
+
+    if (status != XST_SUCCESS) {
+        // If it NACKs here, we must clear the IIC controller state
+        XIic_Reset(&cam->iic_ctrl->iic_instance);
+        XIic_SetAddress(&cam->iic_ctrl->iic_instance, XII_ADDR_TO_SEND_TYPE, cam->iic_ctrl->iic_device_addr);
+    }
+
+    // CRITICAL: The camera needs time to clear internal registers
+    // 50ms is a safe "boot" time for this sensor
+    usleep(50000);
+
+    return XST_SUCCESS;
+}
+
+int OV7670_Basic_Setup(OV7670 *cam)
+{
+    // Reset first
+    int status = OV7670_Reset(cam);
+
+    // Set the color format to RGB - using the COM7 Register
+    status = OV7670_WriteReg(cam, REG_COM7, REG_COM7_RGB_MODE);
+    if(status != XST_SUCCESS) return status;
+
+    // Set the output format to RGB565 and color range to full
+    status = OV7670_WriteReg(cam, REG_COM15, REG_COM15_RGB555_FULL_RANGE);
+    if(status != XST_SUCCESS) return status;
+
+    // We are providing 24MHz as XCLK
+    // Need a stable internal clock, so using 12MHz
+    status = OV7670_WriteReg(cam, REG_CLKRC, REG_CLKRC_CLK_DIV_2);
+    if(status != XST_SUCCESS) return status;
+
+    return XST_SUCCESS;
+}
+
 
